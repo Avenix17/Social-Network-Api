@@ -1,6 +1,8 @@
 const { Users } = require('../models');
 
 const userController = {
+    
+    //functions for different route actions
 
     createUser(req, res) {
         Users.create(req.body)

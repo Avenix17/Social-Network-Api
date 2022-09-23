@@ -1,6 +1,8 @@
 const { Thoughts, Users } = require('../models');
 
 const thoughtController = {
+    
+    // functions for different route actions
 
     createThought(req, res) {
         Thoughts.create(req.body)
