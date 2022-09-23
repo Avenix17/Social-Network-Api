@@ -1,4 +1,3 @@
-const { truncate, truncateSync } = require('fs');
 const { Thoughts, Users } = require('../models');
 
 const thoughtController = {
@@ -58,6 +57,13 @@ const thoughtController = {
 
     deleteThought(req, res) {
         Thoughts.findOneAndDelete({ _id: req.params.id })
+            .then(({ username }) => {
+                return Users.findOneAndUpdate(
+                    { username: username },
+                    { $pull: { thoughts: req.params.id } },
+                    { new: true }
+                )
+            })
             .then(thought => {
                 if (!thought) {
                     res.status(404).json({ message: 'No thoughts with this particular ID!' });
@@ -69,7 +75,7 @@ const thoughtController = {
     },
 
     addReaction(req, res) {
-        Thoughts.findOneAndUpdate({ _id: req.params.thoughtId }, req.body, { new: true, runValidators: true })
+        Thoughts.findOneAndUpdate({ _id: req.params.thoughtId }, { $addToSet: { reactions: req.body } }, { new: true, runValidators: true })
             .then(thought => {
                 if (!thought) {
                     res.status(404).json({ message: 'No thoughts with this particular ID!' });
@@ -82,7 +88,7 @@ const thoughtController = {
     },
 
     deleteReaction(req, res) {
-        Thoughts.findOneAndUpdate({ _id: req.params.thoughtId }, { $pull: { reactions: { reactionId: req.params.reactionId } } }, { new: true })
+        Thoughts.findOneAndUpdate({ _id: req.params.thoughtId }, { $pull: { reactions: { reactionId: req.params.reactionId } } }, { new: true, runValidators: true })
             .then(thought => {
                 if (!thought) {
                     res.status(404).json({ message: 'No thoughts with this particular ID!' });

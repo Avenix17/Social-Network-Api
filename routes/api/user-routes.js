@@ -8,19 +8,19 @@ const {
     deleteUser,
     addFriend,
     deleteFriend
-} = require('../../controllers/users-controller');
+} = require('../../controllers/user-controller');
 
 
 router.route('/')
 .get(getAllUsers)
 .post(createUser);
 
-router.route('/:id')
+router.route('/:userId')
 .get(getUserById)
 .put(updateUser)
 .delete(deleteUser);
 
-router.route('/:id/friends/:friendId')
+router.route('/:userId/friends/:friendId')
 .post(addFriend)
 .delete(deleteFriend);
 

@@ -18,7 +18,7 @@ const userController = {
     },
 
     getUserById(req, res) {
-        Users.findOne({ _id: req.params.id })
+        Users.findOne({ _id: req.params.userId })
             .populate({ path: 'thoughts', select: '-__v' })
             .populate({ path: 'friends', select: '-__v' })
             .select('-__v')
@@ -36,7 +36,7 @@ const userController = {
     },
 
     updateUser(req, res) {
-        Users.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true, runValidators: true })
+        Users.findOneAndUpdate({ _id: req.params.userId }, { $set: req.body}, { new: true, runValidators: true })
             .then(user => {
                 if (!user) {
                     res.status(404).json({ message: 'No User with this ID!' });
@@ -48,7 +48,7 @@ const userController = {
     },
 
     deleteUser(req, res) {
-        Users.findOneAndDelete({ _id: req.params.id })
+        Users.findOneAndDelete({ _id: req.params.userId })
             .then(user => {
                 if (!user) {
                     res.status(404).json({ message: 'No User with this ID!' });
@@ -60,7 +60,7 @@ const userController = {
     },
 
     addFriend(req, res) {
-        Users.findOneAndUpdate({ _id: req.params.userId }, req.body, { new: true, runValidators: true })
+        Users.findOneAndUpdate({ _id: req.params.userId }, {$push: {friends: req.params.friendId}}, { new: true, runValidators: true })
             .then((user) => {
                 if (!user) {
                     res.status(404).json({ message: "No User with this ID!" });
@@ -71,8 +71,8 @@ const userController = {
             .catch((err) => res.status(500).json(err));
     },
 
-    deleteFriend({ params }, res) {
-        Users.findOneAndUpdate({ _id: params.id }, { $pull: { friends: req.params.friendId } }, { new: true, runValidators: true })
+    deleteFriend(req, res) {
+        Users.findOneAndUpdate({ _id: req.params.userId }, { $pull: { friends: req.params.friendId } }, { new: true, runValidators: true })
             .then(user => {
                 if (!user) {
                     res.status(404).json({ message: 'No User with this ID!' });
